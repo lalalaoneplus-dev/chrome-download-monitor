@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Download Monitor by The Nexus Pivot</title>
+    <link rel="stylesheet" href="dashboard.css">
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Download Monitor by The Nexus Pivot home">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="icons/icon128.png" width="40" height="40" alt="">
+        </span>
+        <span>
+          <span class="brand-title">
+            <strong>Download Monitor</strong>
+            <span class="brand-version" id="brandVersion" aria-label="Version"></span>
+          </span>
+          <small>by The Nexus Pivot™ · Browser activity, explained</small>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <div class="monitor-state" id="monitorState" role="status">
+          <span class="status-dot"></span>
+          <span>Monitoring active</span>
+        </div>
+        <button class="button button-ghost" id="openDownloadsButton" type="button">
+          Browser downloads
+        </button>
+        <button class="button button-primary" id="showFolderButton" type="button">
+          Open downloads folder
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Local-only download observability</p>
+          <h1>See what your browser is doing.<br><span>Read what it means.</span></h1>
+          <p class="hero-description">
+            Follow download starts, progress, pauses, failures, safety changes, and completions.
+            When the browser identifies an initiating extension, its name and ID are recorded.
+          </p>
+          <div class="scope-note">
+            <span class="scope-icon" aria-hidden="true">i</span>
+            <p>
+              This monitor observes the browser's download API. It cannot inspect another
+              extension's private code, request bodies, or activity that bypasses browser downloads.
+            </p>
+          </div>
+        </div>
+
+        <aside class="control-card" aria-labelledby="controlsTitle">
+          <div class="control-card-heading">
+            <div>
+              <p class="eyebrow">Capture controls</p>
+              <h2 id="controlsTitle">Monitor settings</h2>
+            </div>
+            <span class="storage-label" id="storageLabel">0 KB stored</span>
+          </div>
+
+          <label class="setting-row" for="monitoringToggle">
+            <span>
+              <strong>Record new events</strong>
+              <small>Pause without deleting existing logs</small>
+            </span>
+            <span class="switch">
+              <input id="monitoringToggle" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+
+          <label class="setting-row" for="extensionOnlyToggle">
+            <span>
+              <strong>Extension downloads only</strong>
+              <small>Ignore downloads without extension attribution</small>
+            </span>
+            <span class="switch">
+              <input id="extensionOnlyToggle" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+
+          <label class="setting-row" for="fullDetailsToggle">
+            <span>
+              <strong>Store full technical details</strong>
+              <small>Off by default; includes source URLs and local file paths in future logs</small>
+            </span>
+            <span class="switch">
+              <input id="fullDetailsToggle" type="checkbox">
+              <span class="switch-track"></span>
+            </span>
+          </label>
+
+          <label class="select-setting" for="maxEventsSelect">
+            <span>
+              <strong>Log retention</strong>
+              <small>Oldest entries are removed automatically</small>
+            </span>
+            <select id="maxEventsSelect">
+              <option value="500">500 events</option>
+              <option value="1000">1,000 events</option>
+              <option value="2000">2,000 events</option>
+              <option value="5000">5,000 events</option>
+            </select>
+          </label>
+        </aside>
+      </section>
+
+      <section class="metrics" aria-label="Download summary">
+        <article class="metric-card">
+          <span class="metric-icon metric-blue" aria-hidden="true">↓</span>
+          <div>
+            <p>Active now</p>
+            <strong id="activeMetric">0</strong>
+          </div>
+          <small id="activeMetricNote">No downloads in progress</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon metric-green" aria-hidden="true">✓</span>
+          <div>
+            <p>Completed</p>
+            <strong id="completedMetric">0</strong>
+          </div>
+          <small>Recorded in this log</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon metric-violet" aria-hidden="true">E</span>
+          <div>
+            <p>Extension-started</p>
+            <strong id="extensionMetric">0</strong>
+          </div>
+          <small>Downloads attributed to an extension</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon metric-amber" aria-hidden="true">!</span>
+          <div>
+            <p>Interrupted</p>
+            <strong id="interruptedMetric">0</strong>
+          </div>
+          <small>Failures and stopped transfers</small>
+        </article>
+      </section>
+
+      <section class="panel live-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Current browser state</p>
+            <h2>Live downloads</h2>
+          </div>
+          <button class="icon-button" id="refreshButton" type="button" title="Refresh now"
+            aria-label="Refresh live downloads">↻</button>
+        </div>
+        <div class="live-downloads" id="liveDownloads">
+          <div class="empty-compact">Checking browser downloads...</div>
+        </div>
+      </section>
+
+      <section class="panel logs-panel">
+        <div class="panel-heading logs-heading">
+          <div>
+            <p class="eyebrow">Recorded activity</p>
+            <h2>Download logs</h2>
+          </div>
+          <div class="log-actions">
+            <button class="button button-ghost" id="exportJsonButton" type="button">Export JSON</button>
+            <button class="button button-ghost" id="exportCsvButton" type="button">Export CSV</button>
+            <button class="button button-danger" id="clearButton" type="button">Clear logs</button>
+          </div>
+        </div>
+
+        <div class="log-toolbar">
+          <div class="view-tabs" role="tablist" aria-label="Log language">
+            <button class="view-tab active" id="naturalTab" role="tab" aria-selected="true"
+              data-view="natural" type="button">
+              Plain-language log
+            </button>
+            <button class="view-tab" id="technicalTab" role="tab" aria-selected="false"
+              data-view="technical" type="button">
+              Technical log
+            </button>
+          </div>
+
+          <div class="filters">
+            <label class="search-field">
+              <span aria-hidden="true">⌕</span>
+              <input id="searchInput" type="search" placeholder="Search logs" autocomplete="off">
+            </label>
+            <select id="sourceFilter" aria-label="Filter by source">
+              <option value="all">All sources</option>
+              <option value="extension">Extension-started</option>
+              <option value="other">Not extension-attributed</option>
+            </select>
+            <select id="eventFilter" aria-label="Filter by event type">
+              <option value="all">All events</option>
+              <option value="started">Started</option>
+              <option value="progress">Progress</option>
+              <option value="completed">Completed</option>
+              <option value="interrupted">Interrupted</option>
+              <option value="other">Other changes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="log-meta">
+          <span id="resultCount">0 downloads</span>
+          <span>Newest first</span>
+        </div>
+        <div class="log-list" id="logList"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>All logs stay in this browser profile unless you export them.</p>
+      <p>Download Monitor by The Nexus Pivot v1.1.0</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="dashboard.js"></script>
+  </body>
+</html>
